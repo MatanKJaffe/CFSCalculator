@@ -1,0 +1,106 @@
+[
+  {
+    "cfs_score": 9,
+    "description": "Terminally Ill",
+    "conditions": {
+      "all": [
+        {
+          "fact": "gait_stability",
+          "operator": "contains",
+          "value": "bedridden"
+        }
+      ]
+    }
+  },
+  {
+    "cfs_score": 8,
+    "description": "Very Severely Frail",
+    "conditions": {
+      "any": [
+        {
+          "fact": "daily_activities",
+          "operator": "contains",
+          "value": "needs_full_help"
+        },
+        {
+          "fact": "daily_activities",
+          "operator": "contains",
+          "value": "not_independent"
+        }
+      ]
+    }
+  },
+  {
+    "cfs_score": 7,
+    "description": "Severely Frail",
+    "conditions": {
+      "all": [
+        {
+          "fact": "functional_status",
+          "operator": "contains",
+          "value": "dependent_bathing"
+        },
+        {
+          "fact": "functional_status",
+          "operator": "contains",
+          "value": "dependent_eating"
+        }
+      ]
+    }
+  },
+  {
+    "cfs_score": 6,
+    "description": "Moderately Frail",
+    "conditions": {
+      "all": [
+        {
+          "fact": "functional_status",
+          "operator": "contains_all",
+          "value": ["dependent_shopping", "dependent_transportation", "dependent_cooking"]
+        }
+      ]
+    }
+  },
+  {
+    "cfs_score": 5,
+    "description": "Mildly Frail",
+    "conditions": {
+      "any": [
+        {
+          "fact": "functional_status",
+          "operator": "contains_any",
+          "value": ["dependent_shopping", "dependent_transportation", "dependent_cooking", "dependent_finances"]
+        }
+      ]
+    }
+  },
+  {
+    "cfs_score": 4,
+    "description": "Vulnerable",
+    "conditions": {
+      "all": [
+        { "fact": "functional_status", "operator": "contains", "value": "independent" },
+        { "fact": "gait_stability", "operator": "contains_any", "value": ["unstable_gait", "weakness"] }
+      ]
+    }
+  },
+  {
+    "cfs_score": 3,
+    "description": "Managing Well",
+    "conditions": {
+      "all": [
+        { "fact": "functional_status", "operator": "contains", "value": "independent" },
+        { "fact": "mobility_aids", "operator": "contains_any", "value": ["uses_cane", "uses_walker"] }
+      ]
+    }
+  },
+  {
+    "cfs_score": 1,
+    "description": "Very Fit",
+    "conditions": {
+      "all": [
+        { "fact": "functional_status", "operator": "contains", "value": "independent" }
+      ]
+    }
+  }
+]
