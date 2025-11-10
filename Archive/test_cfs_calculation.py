@@ -65,7 +65,7 @@ class TestCFSCalculation(unittest.TestCase):
 
         # --- Execution ---
         facts = get_patient_facts(patient_id, assessment_df, diagnosis_df, FACT_DEFINITIONS)
-        cfs_score, _, _ = evaluate_rules(facts, RULES_DATA['rules'])les'])
+        cfs_score, _, _ = evaluate_rules(facts, RULES_DATA['rules'])
 
         # --- Verification ---
         self.assertIn('independent', facts['functional_status'], "Functional status should default to 'independent' when no assessment data is present")
@@ -92,7 +92,7 @@ class TestCFSCalculation(unittest.TestCase):
 
         # --- Execution ---
         facts = get_patient_facts(patient_id, assessment_df, diagnosis_df, FACT_DEFINITIONS)
-        cfs_score, _, _ = evaluate_rules(facts, RULES_DATA['rules'])les'])
+        cfs_score, _, _ = evaluate_rules(facts, RULES_DATA['rules'])
 
         # --- Verification ---
         self.assertIn('independent', facts['functional_status'])
