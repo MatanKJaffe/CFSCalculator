@@ -176,9 +176,9 @@ def main():
     # --- Configuration ---
     RULES_FILE = 'cfs_rules.json'
     FACT_DEFINITIONS_FILE = 'cfs_fact.json'
-    ASSESSMENT_FILE = 'Cleaned_Assessment.csv'
-    DIAGNOSIS_FILE = 'Diagnosis.csv'
-    OUTPUT_FILE = 'CFS_Results.csv'
+    ASSESSMENT_FILE = 'INPUT/Cleaned_Assessment.csv'
+    DIAGNOSIS_FILE = 'INPUT/Diagnosis.csv'
+    OUTPUT_FILE = 'OUTPUT/CFS_Results.csv'
 
     # --- Loading ---
     rules_data = load_json_file(RULES_FILE)
