@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Jupyter Notebook
+.ipynb_checkpoints/
+.editorconfig
+Archive/
+# VS Code
+.vscode/
+.mypy_cache/
+.pytest_cache/
+*.code-workspace
+
+# Output files
+CFS_Results.csv
+
+# OS-generated files
+.DS_Store
+._.DS_Store
+.DS_Store?
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
