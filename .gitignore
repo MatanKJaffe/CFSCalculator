@@ -6,16 +6,15 @@ __pycache__/
 
 # Jupyter Notebook
 .ipynb_checkpoints/
-.editorconfig
-Archive/
+.editorconfig/
+
+Archive
+
 # VS Code
-.vscode/
-.mypy_cache/
+*.vscode/
+*.mypy_cache/
 .pytest_cache/
 *.code-workspace
-
-# Output files
-CFS_Results.csv
 
 # OS-generated files
 .DS_Store
