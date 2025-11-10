@@ -6,9 +6,7 @@ __pycache__/
 
 # Jupyter Notebook
 .ipynb_checkpoints/
-.editorconfig/
-
-Archive/
+.editorconfig
 
 # VS Code
 .vscode/
