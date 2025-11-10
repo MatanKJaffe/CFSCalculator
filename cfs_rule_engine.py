@@ -146,6 +146,7 @@ if __name__ == '__main__':
 
     if rules_data and fact_definitions and diagnosis_df is not None and assessment_df is not None:
         rules = rules_data.get('rules', [])
+        patient_ids = pd.unique(pd.concat([diagnosis_df['PatientNum'], assessment_df['PatientNum']]))
 
         output_data = []
         print(f"Processing {len(patient_ids)} unique patients...")

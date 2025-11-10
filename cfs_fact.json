@@ -22,6 +22,71 @@
           "לא טוב": "poor",
           "רע": "very_poor"
         }
+      },
+      "מצב פיזי נורטון": {
+        "type": "health_status",
+        "value_map": {
+          "טוב": "good",
+          "סביר": "fair",
+          "לא טוב": "poor",
+          "רע": "very_poor"
+        }
+      }
+    },
+    "אמדן וזיהוי צרכים": {
+      "מצב פיזי": {
+        "type": "health_status",
+        "value_map": {
+          "טוב": "good",
+          "סביר": "fair",
+          "לא טוב": "poor",
+          "רע": "very_poor"
+        }
+      },
+      "מצב פיזי נורטון": {
+        "type": "health_status",
+        "value_map": {
+          "טוב": "good",
+          "סביר": "fair",
+          "לא טוב": "poor",
+          "רע": "very_poor"
+        }
+      }
+    },
+    "הזנה": {
+      "מצב פיזי": {
+        "type": "health_status",
+        "value_map": {
+          "טוב": "good",
+          "סביר": "fair",
+          "לא טוב": "poor",
+          "רע": "very_poor"
+        }
+      },
+      "מצב פיזי נורטון": {
+        "type": "health_status",
+        "value_map": {
+          "טוב": "good",
+          "סביר": "fair",
+          "לא טוב": "poor",
+          "רע": "very_poor"
+        }
+      }
+    },
+    "נשימה": {
+      "קוצר נשימה": {
+        "type": "symptoms",
+        "value_map": {
+          "כן": "shortness_of_breath"
+        }
+      }
+    },
+    "כאב": {
+      "כאב": {
+        "type": "symptoms",
+        "value_map": {
+          "כן": "has_pain"
+        }
       }
     },
     "אוכלוסיה בסיכון": {
@@ -52,6 +117,9 @@
     "has_copd": ["COPD", "CHRONIC OBSTRUCTIVE PULMONARY DISEASE"],
     "has_cancer": ["CANCER", "MALIGNANCY", "LYMPHOMA", "LEUKEMIA"],
     "has_stroke": ["CEREBROVASCULAR ACCIDENT", "CVA", "STROKE"]
+  },
+  "ACUTE_DIAGNOSIS_KEYWORDS": {
+    "very_poor": ["SEPSIS", "SHOCK", "ACUTE RENAL FAILURE", "RENAL FAILURE ACUTE", "PNEUMONIA", "PULMONARY EMBOLISM"]
   },
   "CHRONIC_DISEASE_THRESHOLD": 5,
   "TERMINAL_ILLNESS_KEYWORDS": [
