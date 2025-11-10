@@ -34,8 +34,8 @@ class TestCFSCalculation(unittest.TestCase):
         diagnosis_df = pd.DataFrame({'PatientNum': [patient_id], 'fFolder': ['X'], 'Name': ['Hypertension']})
 
         # --- Execution ---
-        facts = get_patient_facts(patient_id, diagnosis_df, assessment_df, FACT_DEFINITIONS)
-        cfs_score = evaluate_rules(facts, RULES_DATA['rules'])
+        facts = get_patient_facts(patient_id, assessment_df, diagnosis_df, FACT_DEFINITIONS)
+        cfs_score, _, _ = evaluate_rules(facts, RULES_DATA['rules'])
 
         # --- Verification ---
         self.assertIn('dependent_bathing', facts['functional_status'])
@@ -64,8 +64,8 @@ class TestCFSCalculation(unittest.TestCase):
         diagnosis_df = pd.DataFrame(diagnosis_data)
 
         # --- Execution ---
-        facts = get_patient_facts(patient_id, diagnosis_df, assessment_df, FACT_DEFINITIONS)
-        cfs_score = evaluate_rules(facts, RULES_DATA['rules'])
+        facts = get_patient_facts(patient_id, assessment_df, diagnosis_df, FACT_DEFINITIONS)
+        cfs_score, _, _ = evaluate_rules(facts, RULES_DATA['rules'])les'])
 
         # --- Verification ---
         self.assertIn('independent', facts['functional_status'], "Functional status should default to 'independent' when no assessment data is present")
@@ -91,8 +91,8 @@ class TestCFSCalculation(unittest.TestCase):
         diagnosis_df = pd.DataFrame({'PatientNum': [patient_id], 'fFolder': ['X'], 'Name': ['Hypertension']})
 
         # --- Execution ---
-        facts = get_patient_facts(patient_id, diagnosis_df, assessment_df, FACT_DEFINITIONS)
-        cfs_score = evaluate_rules(facts, RULES_DATA['rules'])
+        facts = get_patient_facts(patient_id, assessment_df, diagnosis_df, FACT_DEFINITIONS)
+        cfs_score, _, _ = evaluate_rules(facts, RULES_DATA['rules'])les'])
 
         # --- Verification ---
         self.assertIn('independent', facts['functional_status'])

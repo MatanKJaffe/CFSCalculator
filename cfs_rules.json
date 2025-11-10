@@ -8,7 +8,7 @@
           { "fact": "is_terminally_ill", "operator": "equal", "value": true }
         ]
       },
-      "result": 9
+      "result": { "score": 9, "description": "Terminally Ill" }
     },
     {
       "priority": 2,
@@ -19,7 +19,7 @@
           { "fact": "has_dementia", "operator": "equal", "value": true }
         ]
       },
-      "result": 8
+      "result": { "score": 8, "description": "Totally Dependent or Severe Dementia" }
     },
     {
       "priority": 3,
@@ -30,7 +30,7 @@
           { "fact": "functional_status", "operator": "contains", "value": "dependent_eating" }
         ]
       },
-      "result": 7
+      "result": { "score": 7, "description": "Severely Frail (Dependent in Personal Care)" }
     },
     {
       "priority": 4,
@@ -43,7 +43,7 @@
            { "fact": "functional_status", "operator": "contains", "value": "dependent_finances" }
         ]
       },
-      "result": 6
+      "result": { "score": 6, "description": "Moderately Frail (Dependent in IADLs)" }
     },
     {
       "priority": 5,
@@ -55,7 +55,7 @@
           { "fact": "functional_status", "operator": "contains_any", "value": ["dependent_cooking", "dependent_shopping", "dependent_transportation", "dependent_finances", "dependent_medication"] }
         ]
       },
-      "result": 5
+      "result": { "score": 5, "description": "Mildly Frail (Needs help with complex tasks)" }
     },
     {
       "priority": 6,
@@ -65,7 +65,7 @@
             { "fact": "chronic_condition_count", "operator": "greater_than_or_equal", "value": 10 }
         ]
       },
-      "result": 4
+      "result": { "score": 4, "description": "Vulnerable (Major Chronic Conditions)" }
     },
     {
       "priority": 7,
@@ -78,7 +78,7 @@
           { "fact": "chronic_condition_count", "operator": "greater_than_or_equal", "value": 5 }
         ]
       },
-      "result": 4
+      "result": { "score": 4, "description": "Vulnerable (Cognitive, Health, or Comorbidity Burden)" }
     },
     {
       "priority": 8,
@@ -89,7 +89,7 @@
           { "fact": "health_status", "operator": "equal", "value": "fair" }
         ]
       },
-      "result": 3
+      "result": { "score": 3, "description": "Managing Well (Independent but with some health issues)" }
     },
     {
       "priority": 9,
@@ -100,13 +100,13 @@
           { "fact": "health_status", "operator": "equal", "value": "good" }
         ]
       },
-      "result": 2
+      "result": { "score": 2, "description": "Fit (Independent and good health)" }
     },
     {
       "priority": 99,
       "rule_name": "CFS 1: Very Fit (Default)",
       "conditions": { "all": [] },
-      "result": 1
+      "result": { "score": 1, "description": "Very Fit (Default)" }
     }
   ]
 }
