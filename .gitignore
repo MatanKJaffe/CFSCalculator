@@ -8,10 +8,12 @@ __pycache__/
 .ipynb_checkpoints/
 .editorconfig/
 
-Archive
+Archive/
 
 # VS Code
-*.vscode/
+.vscode/
+# JetBrains
+.idea/
 *.mypy_cache/
 .pytest_cache/
 *.code-workspace
@@ -24,3 +26,19 @@ Archive
 .Trashes
 ehthumbs.db
 Thumbs.db
+
+# Virtual environments and build artifacts
+venv/
+env/
+.venv/
+pip-wheel-metadata/
+build/
+dist/
+*.egg-info/
+
+# Environment variables
+.env
+
+# Python tooling caches
+.mypy_cache/
+.pytest_cache/
