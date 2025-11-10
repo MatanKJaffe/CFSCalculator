@@ -10,7 +10,7 @@ def check_condition(fact_value, operator, condition_value):
         return fact_value in condition_value
     if operator == 'greater_than_or_equal':
         return fact_value is not None and fact_value >= condition_value
-    
+
     # List-based operators
     if operator == 'contains':
         return isinstance(fact_value, list) and condition_value in fact_value
@@ -20,7 +20,7 @@ def check_condition(fact_value, operator, condition_value):
         return isinstance(fact_value, list) and any(item in fact_value for item in condition_value)
     if operator == 'contains_all':
         return isinstance(fact_value, list) and all(item in fact_value for item in condition_value)
-        
+
     return False
 
 def evaluate_rules(facts, rules):
@@ -29,7 +29,7 @@ def evaluate_rules(facts, rules):
     Rules are processed by priority.
     """
     sorted_rules = sorted(rules, key=lambda r: r['priority'])
-    
+
     for rule in sorted_rules:
         # Check 'all' conditions
         all_conditions = rule.get('conditions', {}).get('all', [])
@@ -48,7 +48,6 @@ def evaluate_rules(facts, rules):
         # If there are 'any' conditions, they must be met. If only 'all', it must be met.
         if (any_conditions and any_match and all_match) or (not any_conditions and all_match):
             return rule['result']
-            
     return None # No rule matched
 
 # --- 2. Fact Gathering ---
@@ -85,10 +84,10 @@ def get_patient_facts(patient_id, diagnosis_df, assessment_df, fact_definitions)
             if desc in FACT_MAPPING and q_name in FACT_MAPPING[desc]:
                 mapping = FACT_MAPPING[desc][q_name]
                 fact_type = mapping['type']
-                
+
                 if answer in mapping['value_map']:
                     mapped_value = mapping['value_map'][answer]
-                    
+
                     # Handle list-based facts
                     if isinstance(facts.get(fact_type), list):
                         if mapped_value not in facts[fact_type]:
@@ -96,7 +95,7 @@ def get_patient_facts(patient_id, diagnosis_df, assessment_df, fact_definitions)
                     # Handle single-value facts (overwrite with new value)
                     else:
                         facts[fact_type] = mapped_value
-    
+
     # --- Derive facts from Diagnosis data ---
     patient_diagnoses = diagnosis_df[diagnosis_df['PatientNum'] == patient_id]
     if not patient_diagnoses.empty:
@@ -106,14 +105,14 @@ def get_patient_facts(patient_id, diagnosis_df, assessment_df, fact_definitions)
         diagnoses_text = ' '.join(patient_diagnoses['Name'].dropna().astype(str)).lower()
         if any(keyword in diagnoses_text for keyword in TERMINAL_ILLNESS_KEYWORDS):
             facts['is_terminally_ill'] = True
-            
+
         # Check for specific diagnoses from the mapping
         for fact_name, keywords in DIAGNOSIS_MAPPING.items():
             for keyword in keywords:
                 if patient_diagnoses['Name'].str.contains(keyword, case=False, na=False).any():
                     facts[fact_name] = True
                     break # Move to the next fact once a match is found
-            
+
     # If after all assessments, functional_status is empty, patient is independent
     if not facts['functional_status']:
         facts['functional_status'].append('independent')
@@ -147,8 +146,7 @@ if __name__ == '__main__':
 
     if rules_data and fact_definitions and diagnosis_df is not None and assessment_df is not None:
         rules = rules_data.get('rules', [])
-        patient_ids = pd.unique(pd.concat([diagnosis_df['PatientNum'], assessment_df['PatientNum']]))
-        
+
         output_data = []
         print(f"Processing {len(patient_ids)} unique patients...")
 
@@ -182,9 +180,9 @@ if __name__ == '__main__':
             if fact_definitions.get("DIAGNOSIS_MAPPING"):
                 for fact_name in fact_definitions["DIAGNOSIS_MAPPING"].keys():
                     patient_output[fact_name] = facts.get(fact_name, False)
-            
+
             output_data.append(patient_output)
-        
+
         # Convert to DataFrame and save to CSV
         if output_data:
             results_df = pd.DataFrame(output_data, columns=output_columns)
@@ -192,6 +190,6 @@ if __name__ == '__main__':
             print("Processing complete. Results saved to CFS_Results.csv")
         else:
             print("No data was processed.")
-            
+
     else:
         print("Could not run processing due to errors in loading data or definition files.")
