@@ -1,0 +1,63 @@
+{
+  "FACT_MAPPING": {
+    "תפקוד": {
+      "מצב תפקודי": {
+        "type": "functional_status",
+        "value_map": {
+          "עצמאי": "independent",
+          "תלות ברחצה": "dependent_bathing",
+          "תלות באכילה": "dependent_eating",
+          "תלות בהכנת אוכל/בישול": "dependent_cooking",
+          "תלות בקניות": "dependent_shopping",
+          "תלות בהסעות": "dependent_transportation",
+          "תלות בלקיחת תרופות": "dependent_medication",
+          "תלות בטיפול בכספים": "dependent_finances"
+        }
+      },
+      "מצב פיזי": {
+        "type": "health_status",
+        "value_map": {
+          "טוב": "good",
+          "סביר": "fair",
+          "לא טוב": "poor",
+          "רע": "very_poor"
+        }
+      }
+    },
+    "אוכלוסיה בסיכון": {
+      "מצב קוגניטיבי": {
+        "type": "cognitive_status",
+        "value_map": {
+          "מתמצא (בזמן, במקום, באנשים)": "oriented",
+          "אינו מתמצא במקום": "disoriented_place",
+          "אינו מתמצא בזמן": "disoriented_time",
+          "אינו מתמצא באנשים": "disoriented_people"
+        }
+      },
+      "מצב הכרה": {
+        "type": "consciousness_status",
+        "value_map": {
+          "בהכרה": "conscious",
+          "בלבול קל": "mild_confusion",
+          "ערפול": "stupor",
+          "חוסר הכרה": "unconscious"
+        }
+      }
+    }
+  },
+  "DIAGNOSIS_MAPPING": {
+    "has_dementia": ["DEMENTIA", "ALZHEIMER'S DISEASE"],
+    "has_heart_failure": ["CONGESTIVE HEART FAILURE", "CHF"],
+    "has_renal_failure": ["RENAL FAILURE", "CHRONIC KIDNEY DISEASE"],
+    "has_copd": ["COPD", "CHRONIC OBSTRUCTIVE PULMONARY DISEASE"],
+    "has_cancer": ["CANCER", "MALIGNANCY", "LYMPHOMA", "LEUKEMIA"],
+    "has_stroke": ["CEREBROVASCULAR ACCIDENT", "CVA", "STROKE"]
+  },
+  "CHRONIC_DISEASE_THRESHOLD": 5,
+  "TERMINAL_ILLNESS_KEYWORDS": [
+    "terminal",
+    "palliative",
+    "hospice",
+    "end-stage"
+  ]
+}

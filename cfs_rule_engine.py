@@ -2,25 +2,25 @@ import json
 import pandas as pd
 
 # --- 1. Rule Engine Core ---
-
 def check_condition(fact_value, operator, condition_value):
-    """Checks a single condition."""
+    """Checks a single condition against a fact's value."""
     if operator == 'equal':
         return fact_value == condition_value
-    if operator == 'not_equal':
-        return fact_value != condition_value
     if operator == 'in':
         return fact_value in condition_value
-    if operator == 'not_in':
-        return fact_value not in condition_value
-    if operator == 'greater_than':
-        return fact_value > condition_value
-    if operator == 'less_than':
-        return fact_value < condition_value
     if operator == 'greater_than_or_equal':
-        return fact_value >= condition_value
-    if operator == 'less_than_or_equal':
-        return fact_value <= condition_value
+        return fact_value is not None and fact_value >= condition_value
+    
+    # List-based operators
+    if operator == 'contains':
+        return isinstance(fact_value, list) and condition_value in fact_value
+    if operator == 'not_contains':
+        return isinstance(fact_value, list) and condition_value not in fact_value
+    if operator == 'contains_any':
+        return isinstance(fact_value, list) and any(item in fact_value for item in condition_value)
+    if operator == 'contains_all':
+        return isinstance(fact_value, list) and all(item in fact_value for item in condition_value)
+        
     return False
 
 def evaluate_rules(facts, rules):
@@ -31,134 +31,103 @@ def evaluate_rules(facts, rules):
     sorted_rules = sorted(rules, key=lambda r: r['priority'])
     
     for rule in sorted_rules:
-        conditions = rule.get('conditions', {}).get('all', [])
-        if not conditions: # Default rule
-            return rule['result']
-            
-        is_match = all(
-            check_condition(
-                facts.get(cond['fact']), 
-                cond['operator'], 
-                cond['value']
-            ) for cond in conditions
-        )
-        
-        if is_match:
+        # Check 'all' conditions
+        all_conditions = rule.get('conditions', {}).get('all', [])
+        all_match = all(
+            check_condition(facts.get(cond['fact']), cond['operator'], cond['value']) 
+            for cond in all_conditions
+        ) if all_conditions else True
+
+        # Check 'any' conditions
+        any_conditions = rule.get('conditions', {}).get('any', [])
+        any_match = any(
+            check_condition(facts.get(cond['fact']), cond['operator'], cond['value'])
+            for cond in any_conditions
+        ) if any_conditions else False
+
+        # If there are 'any' conditions, they must be met. If only 'all', it must be met.
+        if (any_conditions and any_match and all_match) or (not any_conditions and all_match):
             return rule['result']
             
     return None # No rule matched
 
 # --- 2. Fact Gathering ---
-
-# Define keywords and codes for fact derivation from Diagnosis.csv
-TERMINAL_ILLNESS_KEYWORDS = ['terminal', 'palliative', 'hospice', 'end-stage']
-TERMINAL_ILLNESS_ICD9 = [] 
-
-# --- NEW: Mapping for Cleaned_Assessment.csv ---
-# Maps Hebrew terms from the assessment file to the facts required by the rule engine.
-# We assume any answer other than 'עצמאי' (Independent) means the patient needs help.
-ASSESSMENT_MAPPING = {
-    # Description: 'תפקוד יומיומי' (Daily Functioning)
-    'רחצה': {'type': 'badl'},          # Bathing
-    'הלבשה': {'type': 'badl'},         # Dressing
-    'אכילה': {'type': 'badl'},         # Eating
-    'ניידות': {'type': 'badl'},         # Mobility/Walking
-    'מעברים': {'type': 'badl'},        # Transfers (bed/chair)
-    'שירותים': {'type': 'badl'},       # Toileting
-    
-    'ניהול כספים': {'type': 'iadl'},    # Managing finances
-    'שימוש בתחבורה': {'type': 'iadl'}, # Using transportation
-    'עבודות בית': {'type': 'iadl'},    # Housework
-    'נטילת תרופות': {'type': 'iadl'}, # Taking medication
-    'קניות': {'type': 'iadl'},          # Shopping
-    'הכנת ארוחות': {'type': 'iadl'},   # Meal preparation
-
-    # These might be under a different 'Description', adjust as needed.
-    # Description: 'הערכה כללית' (General Assessment) or similar
-    'הערכת מצב בריאות': {
-        'type': 'self_rated_health',
-        'value_map': { # Translate Hebrew answers to English for the rule engine
-            'טוב מאוד': 'Excellent',
-            'טוב': 'Good',
-            'בינוני': 'Fair',
-            'גרוע': 'Poor'
-        }
-    },
-    # The questions for 'effort' and 'activity' are assumptions.
-    # Please verify if they exist in your data.
-    'תחושת מאמץ': {
-        'type': 'effort_level',
-        'value_map': {
-            'כל הזמן': 'All of the time',
-            'לפעמים': 'Sometimes/Occasionally',
-            'כמעט ואף פעם': 'Rarely/Never'
-        }
-    },
-    'פעילות גופנית': {
-        'type': 'is_active',
-        'positive_answer': 'כן' # Yes
-    }
-}
-INDEPENDENT_ANSWER = 'עצמאי'
-
-
-def get_patient_facts(patient_id, diagnosis_df, assessment_df):
+def get_patient_facts(patient_id, diagnosis_df, assessment_df, fact_definitions):
     """
     Gathers all relevant facts for a patient into a single dictionary.
     """
-    # --- Default facts ---
+    FACT_MAPPING = fact_definitions.get("FACT_MAPPING", {})
+    DIAGNOSIS_MAPPING = fact_definitions.get("DIAGNOSIS_MAPPING", {})
+    TERMINAL_ILLNESS_KEYWORDS = fact_definitions.get("TERMINAL_ILLNESS_KEYWORDS", [])
+    CHRONIC_DISEASE_THRESHOLD = fact_definitions.get("CHRONIC_DISEASE_THRESHOLD", 5)
+
+    # --- Initialize facts with default values and list structures ---
     facts = {
-        'is_terminally_ill': False, 'badl_count': 0, 'iadl_count': 0,
-        'chronic_condition_count': 0, 'self_rated_health': None,
-        'effort_level': None, 'is_active': False
+        'functional_status': [],
+        'health_status': None,
+        'cognitive_status': [],
+        'consciousness_status': None,
+        'is_terminally_ill': False,
+        'chronic_condition_count': 0
     }
+    # Initialize boolean facts for specific diagnoses
+    for fact_name in DIAGNOSIS_MAPPING.keys():
+        facts[fact_name] = False
 
-    # --- Derive facts from Diagnosis data ---
-    patient_diagnoses = diagnosis_df[diagnosis_df['PatientNum'] == patient_id]
-    if patient_diagnoses.empty:
-        return None # No data for this patient
-
-    background_diagnoses = patient_diagnoses[patient_diagnoses['fFolder'] == 'X']
-    facts['chronic_condition_count'] = background_diagnoses['Name'].nunique()
-
-    diagnoses_text = ' '.join(patient_diagnoses['Name'].dropna().astype(str)).lower()
-    if any(keyword in diagnoses_text for keyword in TERMINAL_ILLNESS_KEYWORDS):
-        facts['is_terminally_ill'] = True
-    
     # --- Derive facts from Assessment data ---
     if assessment_df is not None:
         patient_assessments = assessment_df[assessment_df['PatientNum'] == patient_id]
-        
         for _, row in patient_assessments.iterrows():
+            desc = row['Description']
             q_name = row['Question_Name']
             answer = row['Answer_Text']
-            
-            if q_name in ASSESSMENT_MAPPING:
-                mapping = ASSESSMENT_MAPPING[q_name]
-                q_type = mapping['type']
 
-                if q_type == 'badl' and answer != INDEPENDENT_ANSWER:
-                    facts['badl_count'] += 1
-                elif q_type == 'iadl' and answer != INDEPENDENT_ANSWER:
-                    facts['iadl_count'] += 1
-                elif q_type == 'is_active':
-                    facts['is_active'] = (answer == mapping['positive_answer'])
-                elif q_type == 'self_rated_health':
-                    facts['self_rated_health'] = mapping['value_map'].get(answer)
-                elif q_type == 'effort_level':
-                    facts['effort_level'] = mapping['value_map'].get(answer)
+            if desc in FACT_MAPPING and q_name in FACT_MAPPING[desc]:
+                mapping = FACT_MAPPING[desc][q_name]
+                fact_type = mapping['type']
+                
+                if answer in mapping['value_map']:
+                    mapped_value = mapping['value_map'][answer]
+                    
+                    # Handle list-based facts
+                    if isinstance(facts.get(fact_type), list):
+                        if mapped_value not in facts[fact_type]:
+                            facts[fact_type].append(mapped_value)
+                    # Handle single-value facts (overwrite with new value)
+                    else:
+                        facts[fact_type] = mapped_value
+    
+    # --- Derive facts from Diagnosis data ---
+    patient_diagnoses = diagnosis_df[diagnosis_df['PatientNum'] == patient_id]
+    if not patient_diagnoses.empty:
+        background_diagnoses = patient_diagnoses[patient_diagnoses['fFolder'] == 'X']
+        facts['chronic_condition_count'] = background_diagnoses['Name'].nunique()
+
+        diagnoses_text = ' '.join(patient_diagnoses['Name'].dropna().astype(str)).lower()
+        if any(keyword in diagnoses_text for keyword in TERMINAL_ILLNESS_KEYWORDS):
+            facts['is_terminally_ill'] = True
+            
+        # Check for specific diagnoses from the mapping
+        for fact_name, keywords in DIAGNOSIS_MAPPING.items():
+            for keyword in keywords:
+                if patient_diagnoses['Name'].str.contains(keyword, case=False, na=False).any():
+                    facts[fact_name] = True
+                    break # Move to the next fact once a match is found
+            
+    # If after all assessments, functional_status is empty, patient is independent
+    if not facts['functional_status']:
+        facts['functional_status'].append('independent')
 
     return facts
 
 # --- 3. Main Execution ---
-
-def load_rules(filepath='cfs_rules.json'):
-    """Loads rules from a JSON file."""
+def load_json_file(filepath):
+    """Loads a JSON file with UTF-8 encoding."""
     try:
-        with open(filepath, 'r') as f:
-            return json.load(f)['rules']
+        with open(filepath, 'r', encoding='utf-8') as f:
+            return json.load(f)
     except (FileNotFoundError, json.JSONDecodeError) as e:
-        print(f"Error loading rules file: {e}")
+        print(f"Error loading file {filepath}: {e}")
         return None
 
 def load_data(diagnosis_path='Diagnosis.csv', assessment_path='Cleaned_Assessment.csv'):
@@ -172,23 +141,57 @@ def load_data(diagnosis_path='Diagnosis.csv', assessment_path='Cleaned_Assessmen
         return None, None
 
 if __name__ == '__main__':
-    rules = load_rules()
+    rules_data = load_json_file('cfs_rules.json')
+    fact_definitions = load_json_file('cfs_fact.json')
     diagnosis_df, assessment_df = load_data()
 
-    if rules and diagnosis_df is not None and assessment_df is not None:
-        patient_ids = diagnosis_df['PatientNum'].unique()
+    if rules_data and fact_definitions and diagnosis_df is not None and assessment_df is not None:
+        rules = rules_data.get('rules', [])
+        patient_ids = pd.unique(pd.concat([diagnosis_df['PatientNum'], assessment_df['PatientNum']]))
         
-        results = {}
-        # Example: Calculate for patient 640001
-        patient_id_to_test = 640001
-        if patient_id_to_test in patient_ids:
-            facts = get_patient_facts(patient_id_to_test, diagnosis_df, assessment_df)
-            if facts:
-                cfs_score = evaluate_rules(facts, rules)
-                results[patient_id_to_test] = {
-                    'CFS_Score': cfs_score,
-                    'Facts': facts
-                }
+        output_data = []
+        print(f"Processing {len(patient_ids)} unique patients...")
+
+        # Define the columns for the output CSV
+        output_columns = [
+            'PatientNum', 'CFS_Score', 'Functional_Status', 'Health_Status', 
+            'Cognitive_Status', 'Consciousness_Status', 'Is_Terminally_Ill', 
+            'Chronic_Condition_Count'
+        ]
+        # Add specific diagnosis columns dynamically
+        if fact_definitions.get("DIAGNOSIS_MAPPING"):
+            output_columns.extend(fact_definitions["DIAGNOSIS_MAPPING"].keys())
+
+        # Calculate for all unique patients
+        for patient_id in patient_ids:
+            facts = get_patient_facts(patient_id, diagnosis_df, assessment_df, fact_definitions)
+            cfs_score = evaluate_rules(facts, rules)
+
+            # Prepare data for output
+            patient_output = {
+                'PatientNum': str(patient_id),
+                'CFS_Score': cfs_score,
+                'Functional_Status': ', '.join(facts.get('functional_status', [])),
+                'Health_Status': facts.get('health_status'),
+                'Cognitive_Status': ', '.join(facts.get('cognitive_status', [])),
+                'Consciousness_Status': facts.get('consciousness_status'),
+                'Is_Terminally_Ill': facts.get('is_terminally_ill', False),
+                'Chronic_Condition_Count': facts.get('chronic_condition_count', 0)
+            }
+            # Add specific diagnosis facts to the output
+            if fact_definitions.get("DIAGNOSIS_MAPPING"):
+                for fact_name in fact_definitions["DIAGNOSIS_MAPPING"].keys():
+                    patient_output[fact_name] = facts.get(fact_name, False)
+            
+            output_data.append(patient_output)
         
-        print("CFS Calculation Results:")
-        print(json.dumps(results, indent=2, ensure_ascii=False))
+        # Convert to DataFrame and save to CSV
+        if output_data:
+            results_df = pd.DataFrame(output_data, columns=output_columns)
+            results_df.to_csv('CFS_Results.csv', index=False)
+            print("Processing complete. Results saved to CFS_Results.csv")
+        else:
+            print("No data was processed.")
+            
+    else:
+        print("Could not run processing due to errors in loading data or definition files.")
