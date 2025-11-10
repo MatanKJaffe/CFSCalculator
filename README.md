@@ -2,8 +2,116 @@
 
 This project implements a rule-based engine in Python to automatically calculate the Clinical Frailty Scale (CFS) for patients based on data from two main sources: `Cleaned_Assessment.csv` and `Diagnosis.csv`.
 
-![CFS Explanation](CFS_EXPLENATION.jpeg)
-![CFS Classification Tree](CFS_Classification_TREE.jpeg)
+## Clinical Frailty Scale (CFS) Descriptions
+
+### 1. Very Fit
+People who are robust, active, energetic and motivated. They tend to exercise regularly and are among the fittest for their age.
+
+### 2. Fit
+People who have no active disease symptoms but are less fit than category 1. Often, they exercise or are very active occasionally, e.g., seasonally.
+
+### 3. Managing Well
+People whose medical problems are well controlled, even if occasionally symptomatic, but often are not regularly active beyond routine walking.
+
+### 4. Living with Very Mild Frailty
+Previously "vulnerable," this category marks early transition from complete independence. While not dependent on others for daily help, often symptoms limit activities. A common complaint is being "slowed up" and/or being tired during the day.
+
+### 5. Living with Mild Frailty
+People who often have more evident slowing, and need help with high order instrumental activities of daily living (finances, transportation, heavy housework). Typically, mild frailty progressively impairs shopping and walking outside alone, meal preparation, medications and begins to restrict light housework.
+
+### 6. Living with Moderate Frailty
+People who need help with all outside activities and with keeping house. Inside, they often have problems with stairs and need help with bathing and might need minimal assistance (cuing, standby) with dressing.
+
+### 7. Living with Severe Frailty
+Completely dependent for personal care, from whatever cause (physical or cognitive). Even so, they seem stable and not at high risk of dying (within ~6 months).
+
+### 8. Living with Very Severe Frailty
+Completely dependent for personal care and approaching end of life. Typically, they could not recover even from a minor illness.
+
+### 9. Terminally Ill
+Approaching the end of life. This category applies to people with a life expectancy < 6 months, who are not otherwise living with severe frailty. (Many terminally ill people can still exercise until very close to death.)
+
+---
+
+### Scoring Frailty in People with Dementia
+The degree of frailty generally corresponds to the degree of dementia. Common symptoms in mild dementia include forgetting the details of a recent event, though still remembering the event itself, repeating the same question/story and social withdrawal.
+
+In moderate dementia, recent memory is very impaired, even though they seemingly can remember their past life events well. They can do personal care with prompting.
+
+In severe dementia, they cannot do personal care without help.
+
+In very severe dementia they are often bedfast. Many are virtually mute.
+
+*Clinical Frailty Scale @2005-2020 Rockwood, Version 2.0 (EN). All rights reserved. For permission: www.geriatricmedicineresearch.ca*
+
+## CFS Classification Flowchart
+
+```mermaid
+graph TD
+    A[Terminally ill?] -->|Yes| B(Number of BADLs?)
+    A -->|No| E(Number of BADLs?)
+
+    subgraph "Branch: Terminally Ill"
+        direction TB
+        B -- "0-2 BADLs" --> C[CFS 8: Very Severe Frailty]
+        B -- "3-5 BADLs" --> D[CFS 8: Very Severe Frailty]
+    end
+
+    subgraph "Branch: Not Terminally Ill"
+        direction TB
+        E -- "3-5 BADLs" --> F(BADLs Check)
+            F -- "3-5 BADLs" --> G[CFS 7: Severe Frailty]
+            F -- "1-2 BADLs" --> H[CFS 6: Moderate Frailty]
+
+        E -- "None" --> I(Number of IADLs?)
+            I -- "5-6 IADLs" --> J[CFS 6: Moderate Frailty]
+            I -- "1-4 IADLs" --> K[CFS 5: Mild Frailty]
+            I -- "None" --> L(Number of Chronic Conditions?)
+
+        L -- "&ge;10" --> M[CFS 4: Very Mild Frailty]
+        L -- "0-9" --> N(Self-Rated Health?)
+
+        N -- "Fair/Poor" --> Q[CFS 4: Very Mild Frailty]
+        N -- "Excellent" --> O("Everything is an effort?")
+        N -- "Very Good/Good" --> R("Everything is an effort?")
+
+        subgraph "Path: Health Excellent"
+            direction TB
+            O -- "All of the time<br>(5-7 days/week)" --> P[CFS 4: Very Mild Frailty]
+            O -- "Rarely/Never<br>(<1 day/week)" --> S(Engages in sports?)
+            O -- "Sometimes/Occasionally<br>(1-4 days/week)" --> T(Engages in sports?)
+            S -- "Yes" --> S_Y[CFS 1: Very Fit]
+            S -- "No" --> S_N[CFS 2: Fit]
+            T -- "Yes" --> T_Y[CFS 2: Fit]
+            T -- "No" --> T_N[CFS 2: Fit]
+        end
+
+        subgraph "Path: Health Very Good/Good"
+            direction TB
+            R -- "All of the time<br>(5-7 days/week)" --> U[CFS 4: Very Mild Frailty]
+            R -- "Rarely/Never<br>(<1 day/week)" --> V(Engages in sports?)
+            R -- "Sometimes/Occasionally<br>(1-4 days/week)" --> W(Engages in sports?)
+            V -- "Yes" --> V_Y[CFS 2: Fit]
+            V -- "No" --> V_N[CFS 3: Managing Well]
+            W -- "Yes" --> W_Y[CFS 2: Fit]
+            W -- "No" --> W_N[CFS 3: Managing Well]
+        end
+    end
+
+    %% --- Styling ---
+    classDef default fill:#f4f4f4,stroke:#333,stroke-width:1px,border-radius:5px
+    classDef decision fill:#e0f7fa,stroke:#00796b,stroke-width:2px,border-radius:5px
+    classDef result fill:#e8f5e9,stroke:#388e3c,stroke-width:2px,font-weight:bold,border-radius:5px
+
+    class A,B,E,F,I,L,N,O,R,S,T,V,W decision;
+    class C,D,G,H,J,K,M,P,Q,S_Y,S_N,T_Y,T_N,U,V_Y,V_N,W_Y,W_N result;
+```
+
+
+### Definitions
+
+- **BADLs**: Basic Activities of Daily Living
+- **IADLs**: Instrumental Activities of Daily Living
 
 ## How It Works
 
