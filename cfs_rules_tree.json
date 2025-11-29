@@ -1,0 +1,164 @@
+{
+  "decision_tree": {
+    "condition": {
+      "fact": "is_terminally_ill",
+      "operator": "equal",
+      "value": true
+    },
+    "yes": {
+      "result": {
+        "score": 9,
+        "description": "Terminally Ill"
+      }
+    },
+    "no": {
+      "condition": {
+        "fact": "badl_count",
+        "operator": "greater_than_or_equal",
+        "value": 3
+      },
+      "yes": {
+        "condition": {
+          "fact": "badl_count",
+          "operator": "in_range",
+          "value": [3, 5]
+        },
+        "yes": {
+            "result": {
+                "score": 8,
+                "description": "Living with Very Severe Frailty, Totally Dependent"
+            }
+        },
+        "no": {
+            "result": {
+                "score": 7,
+                "description": "Living with Severe Frailty"
+            }
+        }
+      },
+      "no": {
+        "condition": {
+            "fact": "badl_count",
+            "operator": "in_range",
+            "value": [1, 2]
+          },
+          "yes": {
+            "result": {
+              "score": 6,
+              "description": "Living with Moderate Frailty"
+            }
+          },
+          "no": {
+            "condition": {
+                "fact": "iadl_count",
+                "operator": "greater_than_or_equal",
+                "value": 1
+              },
+              "yes": {
+                "condition": {
+                    "fact": "iadl_count",
+                    "operator": "in_range",
+                    "value": [1, 4]
+                  },
+                  "yes": {
+                    "result": {
+                      "score": 5,
+                      "description": "Living with Mild Frailty"
+                    }
+                  },
+                  "no": {
+                     "result": {
+                      "score": 6,
+                      "description": "Living with Moderate Frailty"
+                    }
+                  }
+              },
+              "no": {
+                "condition": {
+                    "fact": "chronic_condition_count",
+                    "operator": "greater_than_or_equal",
+                    "value": 10
+                    },
+                    "yes": {
+                        "result": {
+                            "score": 4,
+                            "description": "Living with Very Mild Frailty"
+                        }
+                    },
+                    "no": {
+                        "condition": {
+                            "fact": "self_rated_health",
+                            "operator": "in",
+                            "value": ["Fair", "Poor"]
+                        },
+                        "yes": {
+                            "result": {
+                                "score": 4,
+                                "description": "Living with Very Mild Frailty"
+                            }
+                        },
+                        "no": {
+                            "condition": {
+                                "fact": "effort_to_perform_tasks",
+                                "operator": "equal",
+                                "value": "rarely_never"
+                            },
+                            "yes": {
+                                "condition": {
+                                    "fact": "engages_in_strenuous_activity",
+                                    "operator": "equal",
+                                    "value": false
+                                },
+                                "yes": {
+                                    "result": {
+                                        "score": 2,
+                                        "description": "Fit"
+                                    }
+                                },
+                                "no": {
+                                    "result": {
+                                        "score": 1,
+                                        "description": "Very Fit"
+                                    }
+                                }
+                            },
+                            "no": {
+                                "condition": {
+                                    "fact": "effort_to_perform_tasks",
+                                    "operator": "equal",
+                                    "value": "sometimes_occasionally"
+                                },
+                                "yes": {
+                                    "condition": {
+                                        "fact": "engages_in_strenuous_activity",
+                                        "operator": "equal",
+                                        "value": false
+                                    },
+                                    "yes": {
+                                        "result": {
+                                            "score": 3,
+                                            "description": "Managing Well"
+                                        }
+                                    },
+                                    "no": {
+                                        "result": {
+                                            "score": 2,
+                                            "description": "Fit"
+                                        }
+                                    }
+                                },
+                                "no": {
+                                    "result": {
+                                        "score": 4,
+                                        "description": "Living with Very Mild Frailty"
+                                    }
+                                }
+                            }
+                        }
+                    }
+              }
+          }
+      }
+    }
+  }
+}
