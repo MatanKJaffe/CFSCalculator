@@ -40,3 +40,4 @@ dist/
 # Python tooling caches
 .mypy_cache/
 .pytest_cache/
+.genkit/
