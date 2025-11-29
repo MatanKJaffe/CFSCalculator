@@ -1,7 +1,7 @@
 import unittest
 import pandas as pd
 import json
-from cfs_rule_engine import get_patient_facts, evaluate_rules
+from Archive.cfs_rule_engine import get_patient_facts, evaluate_rules
 
 # We will use the actual rules and fact definitions for this test
 with open('cfs_rules.json', 'r', encoding='utf-8') as f:

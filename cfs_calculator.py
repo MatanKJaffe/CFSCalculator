@@ -1,6 +1,8 @@
 
 import pandas as pd
 from typing import Any, Dict, List, Optional, Union
+from tqdm import tqdm
+
 
 class FactMappings:
     """
@@ -241,7 +243,7 @@ class CFSCalculator:
         self._extract_assessment_facts(patient_data, facts)
         
         # 2. Extract facts from the diagnosis data
-        self._extract_diagnosis_facts(patient_data['id_patient'], diagnosis_data, facts)
+        self._extract_diagnosis_facts(patient_data['PatientNum'], diagnosis_data, facts)
         
         # 3. Derive complex facts
         self._derive_complex_facts(facts)
@@ -269,13 +271,13 @@ class CFSCalculator:
 
     def _extract_diagnosis_facts(self, patient_id: int, diagnosis_data: pd.DataFrame, facts: Dict[str, Any]):
         """Extracts facts from the patient's diagnoses."""
-        patient_diagnoses = diagnosis_data[diagnosis_data['id_patient'] == patient_id]
+        patient_diagnoses = diagnosis_data[diagnosis_data['PatientNum'] == patient_id]
         if patient_diagnoses.empty:
             facts['chronic_condition_count'] = 0
             facts['is_terminally_ill'] = False
             return
             
-        diagnoses_list = patient_diagnoses['diagnosis'].str.upper().tolist()
+        diagnoses_list = patient_diagnoses['Name'].str.upper().tolist()
         
         # Check for terminal illness
         facts['is_terminally_ill'] = any(keyword in diag for diag in diagnoses_list for keyword in FactMappings.TERMINAL_ILLNESS_KEYWORDS)
@@ -314,7 +316,7 @@ class CFSCalculator:
         patient_facts = self.get_patient_facts(patient_data, diagnosis_data)
         result_node = self.decision_tree.evaluate(patient_facts)
         return {
-            "id_patient": patient_data['id_patient'],
+            "PatientNum": patient_data['PatientNum'],
             "cfs_score": result_node.score,
             "cfs_description": result_node.description,
             "facts": patient_facts
@@ -336,15 +338,14 @@ if __name__ == '__main__':
     calculator = CFSCalculator()
     
     results = []
-    for index, patient_row in assessment_df.iterrows():
+    for index, patient_row in tqdm(assessment_df.iterrows(), total=assessment_df.shape[0], desc="Processing Patients"):
         result = calculator.calculate(patient_row, diagnosis_df)
         results.append(result)
-        print(f"Processed Patient ID: {result['id_patient']}, CFS Score: {result['cfs_score']}")
 
     results_df = pd.DataFrame(results)
     
     # Reorder columns for clarity
-    final_columns = ['id_patient', 'cfs_score', 'cfs_description', 'facts']
+    final_columns = ['PatientNum', 'cfs_score', 'cfs_description', 'facts']
     results_df = results_df[final_columns]
     
     results_df.to_csv('OUTPUT/CFS_Results.csv', index=False, encoding='utf-8-sig')
