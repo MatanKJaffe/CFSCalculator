@@ -120,7 +120,7 @@ flowchart TD
     N8 -- Yes --> N9
     N12{chronic_condition_count greater_than_or_equal 10}
     N13{encounter_type equal F}
-    N14{self_rated_health in ['good', 'excellent']}
+        N14{self_rated_health is good or excellent}
     N15["CFS 3: Managing Well"]
     N14 -- Yes --> N15
     N16["CFS 4: Living with Very Mild Frailty"]
@@ -131,7 +131,7 @@ flowchart TD
     N12 -- Yes --> N13
     N18{self_rated_health in ['Fair', 'Poor']}
     N19{encounter_type equal F}
-    N20{self_rated_health in ['good', 'excellent']}
+        N20{self_rated_health is good or excellent}
     N21["CFS 3: Managing Well"]
     N20 -- Yes --> N21
     N22["CFS 4: Living with Very Mild Frailty"]
@@ -156,7 +156,7 @@ flowchart TD
     N28 -- Yes --> N29
     N32{encounter_type equal F}
     N33{self_rated_health in ['good', 'excellent']}
-    N34["CFS 3: Managing Well"]
+        N34["CFS 3: Managing Well"]
     N33 -- Yes --> N34
     N35["CFS 4: Living with Very Mild Frailty"]
     N33 -- No --> N35
