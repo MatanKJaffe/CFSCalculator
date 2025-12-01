@@ -92,10 +92,6 @@ The calculation logic is contained within the `cfs_calculator.py` script and is 
 ## 📊 Implemented Logic Flowchart
 
 The flowchart below visualizes the exact decision tree implemented in the code, including the new context-aware logic.
-
-<details>
-<summary>Click to view the logic flowchart</summary>
-
 ```mermaid
 flowchart TD
     N0{is_terminally_ill equal True}
@@ -163,6 +159,7 @@ flowchart TD
     N32 -- Yes --> N33
     N36["CFS 4: Living with Very Mild Frailty"]
     N32 -- No --> N36
+
     N28 -- No --> N32
     N24 -- No --> N28
     N18 -- No --> N24
