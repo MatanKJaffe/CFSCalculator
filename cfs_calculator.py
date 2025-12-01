@@ -187,10 +187,35 @@ class DecisionNode:
 
 
 class CFSCalculator:
-    """
-    A self-contained class to calculate the Clinical Frailty Scale score.
-    The decision tree is built from Python objects, making the logic clear and contained.
-    """
+    def print_logic(self):
+        """
+        Prints a mermaid markdown diagram of the CFS decision tree logic.
+        """
+        print(f"""```mermaid\n{self._generate_mermaid(self.decision_tree)}\n```""")
+
+    def _generate_mermaid(self, node, parent=None, parent_label=None, node_id=None, lines=None):
+        """
+        Recursively generates mermaid flowchart code for the decision tree.
+        """
+        if node_id is None:
+            node_id = [0]
+        if lines is None:
+            lines = ["flowchart TD"]
+        nid = f"N{node_id[0]}"
+        node_id[0] += 1
+        if isinstance(node, ResultNode):
+            label = f"CFS {node.score}: {node.description}"
+            lines.append(f"    {nid}[\"{label}\"]")
+        else:
+            cond = f"{node.condition_fact} {node.condition_operator} {node.condition_value}"
+            lines.append(f"    {nid}{{{cond}}}")
+            # Yes branch
+            yes_id = self._generate_mermaid(node.yes_node, nid, 'Yes', node_id, lines)
+            lines.append(f"    {nid} -- Yes --> {yes_id}")
+            # No branch
+            no_id = self._generate_mermaid(node.no_node, nid, 'No', node_id, lines)
+            lines.append(f"    {nid} -- No --> {no_id}")
+        return '\n'.join(lines) if parent is None else nid
     def __init__(self):
         self.decision_tree = self._build_decision_tree()
 
@@ -319,8 +344,7 @@ class CFSCalculator:
             "PatientNum": patient_data['PatientNum'],
             "cfs_score": result_node.score,
             "cfs_description": result_node.description,
-            "facts": patient_facts
-        }
+            "facts": patient_facts}
 
 
 if __name__ == '__main__':

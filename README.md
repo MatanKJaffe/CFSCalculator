@@ -1,3 +1,23 @@
+# Decision Tree Visualization & fFolder Logic
+
+## fFolder (Admission/Followup) Logic
+
+The CFS calculation engine can now take into account the `fFolder` column from `Diagnosis.csv`, which indicates whether a record is from an Admission (`A`) or a Followup (`F`). This allows the decision tree to be sensitive to the context of the patient encounter. If you wish to implement different logic for Admission vs. Followup, you can use the `fFolder` value in your rules or fact-gathering logic.
+
+Currently, the default logic treats Admission and Followup identically unless you add rules or fact derivations that use `fFolder`.
+
+## Visualizing the Implemented Decision Tree
+
+You can print a Mermaid markdown diagram of the actual implemented decision tree (as coded in `cfs_calculator.py`) by calling the `print_logic()` method of the `CFSCalculator` class:
+
+```python
+from cfs_calculator import CFSCalculator
+calculator = CFSCalculator()
+calculator.print_logic()
+```
+
+This will output a Mermaid flowchart that you can paste into Markdown viewers or tools that support Mermaid diagrams to visualize the current logic.
+
 # Clinical Frailty Scale (CFS) Calculation Engine
 
 This project implements a rule-based engine in Python to automatically calculate the Clinical Frailty Scale (CFS) for patients based on data from two main sources: `Cleaned_Assessment.csv` and `Diagnosis.csv`.
@@ -131,6 +151,7 @@ The system uses a decoupled architecture where the logic is separated from the d
     c. **Assign Score**: The first rule that matches the patient's facts determines their CFS score.
 4. **Save Results**: The final CFS scores, along with all the facts used for the calculation, are saved to `CFS_Results.csv`.
 
+
 ## Running the Script
 
 To run the calculation, execute the following command in a terminal with the appropriate Python environment activated:
@@ -138,6 +159,16 @@ To run the calculation, execute the following command in a terminal with the app
 ```bash
 python cfs_rule_engine.py
 ```
+
+## Running the Tests
+
+To run the unit tests (including Admission/Followup logic):
+
+```bash
+python -m unittest Archive/test_cfs_calculation.py
+```
+
+All tests should pass if the logic is correct. The tests cover edge cases, missing data, and both Admission and Followup scenarios.
 
 ## Clinical Frailty Scale (CFS) Implementation
 
