@@ -125,9 +125,9 @@ flowchart TD
     N17["CFS 4: Living with Very Mild Frailty"]
     N13 -- No --> N17
     N12 -- Yes --> N13
-    N18{self_rated_health in ['Fair', 'Poor']}
+    N18{self_rated_health is fair or poor}
     N19{encounter_type equal F}
-        N20{self_rated_health is good or excellent}
+    N20{self_rated_health is good or excellent}
     N21["CFS 3: Managing Well"]
     N20 -- Yes --> N21
     N22["CFS 4: Living with Very Mild Frailty"]
@@ -151,8 +151,8 @@ flowchart TD
     N29 -- No --> N31
     N28 -- Yes --> N29
     N32{encounter_type equal F}
-    N33{self_rated_health in ['good', 'excellent']}
-        N34["CFS 3: Managing Well"]
+    N33{self_rated_health is good or excellent}
+    N34["CFS 3: Managing Well"]
     N33 -- Yes --> N34
     N35["CFS 4: Living with Very Mild Frailty"]
     N33 -- No --> N35
