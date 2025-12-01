@@ -99,47 +99,78 @@ The flowchart below visualizes the exact decision tree implemented in the code, 
 ```mermaid
 flowchart TD
     N0{is_terminally_ill equal True}
-    N0 -- Yes --> N1["CFS 9: Terminally Ill"]
-    N0 -- No --> N2{badl_count greater_than_or_equal 3}
-    N2 -- Yes --> N3{badl_count in_range [3, 5]}
-    N3 -- Yes --> N4["CFS 8: Living with Very Severe Frailty, Totally Dependent"]
-    N3 -- No --> N5["CFS 7: Living with Severe Frailty"]
-    N2 -- No --> N6{badl_count in_range [1, 2]}
-    N6 -- Yes --> N7["CFS 6: Living with Moderate Frailty"]
-    N6 -- No --> N8{iadl_count greater_than_or_equal 1}
-    N8 -- Yes --> N9{iadl_count in_range [1, 4]}
-    N9 -- Yes --> N10["CFS 5: Living with Mild Frailty"]
-    N9 -- No --> N11["CFS 6: Living with Moderate Frailty"]
-    N8 -- No --> N12{chronic_condition_count greater_than_or_equal 10}
-
-    N12 -- Yes --> N13{encounter_type equal 'F'}
-    N13 -- No --> N14["CFS 4: Living with Very Mild Frailty"]
-    N13 -- Yes --> N15{self_rated_health in ['good', 'excellent']}
-    N15 -- Yes --> N16["CFS 3: Managing Well"]
-    N15 -- No --> N14
-
-    N12 -- No --> N17{self_rated_health in ['Fair', 'Poor']}
-
-    N17 -- Yes --> N18{encounter_type equal 'F'}
-    N18 -- No --> N19["CFS 4: Living with Very Mild Frailty"]
-    N18 -- Yes --> N20{self_rated_health in ['good', 'excellent']}
-    N20 -- Yes --> N21["CFS 3: Managing Well"]
-    N20 -- No --> N19
-
-    N17 -- No --> N22{effort_to_perform_tasks equal sometimes_occasionally}
-    N22 -- Yes --> N23{engages_in_strenuous_activity equal False}
-    N23 -- Yes --> N24["CFS 3: Managing Well"]
-    N23 -- No --> N25["CFS 2: Fit"]
-    N22 -- No --> N26{effort_to_perform_tasks equal rarely_never}
-    N26 -- Yes --> N27{engages_in_strenuous_activity equal False}
-    N27 -- Yes --> N28["CFS 2: Fit"]
-    N27 -- No --> N29["CFS 1: Very Fit"]
-    
-    N26 -- No --> N30{encounter_type equal 'F'}
-    N30 -- No --> N31["CFS 4: Living with Very Mild Frailty"]
-    N30 -- Yes --> N32{self_rated_health in ['good', 'excellent']}
-    N32 -- Yes --> N33["CFS 3: Managing Well"]
-    N32 -- No --> N31
+    N1["CFS 9: Terminally Ill"]
+    N0 -- Yes --> N1
+    N2{badl_count greater_than_or_equal 3}
+    N3{badl_count is 3-5}
+    N4["CFS 8: Living with Very Severe Frailty, Totally Dependent"]
+    N3 -- Yes --> N4
+    N5["CFS 7: Living with Severe Frailty"]
+    N3 -- No --> N5
+    N2 -- Yes --> N3
+    N6{badl_count is 1-2}
+    N7["CFS 6: Living with Moderate Frailty"]
+    N6 -- Yes --> N7
+    N8{iadl_count greater_than_or_equal 1}
+    N9{iadl_count is 1-4}
+    N10["CFS 5: Living with Mild Frailty"]
+    N9 -- Yes --> N10
+    N11["CFS 6: Living with Moderate Frailty"]
+    N9 -- No --> N11
+    N8 -- Yes --> N9
+    N12{chronic_condition_count greater_than_or_equal 10}
+    N13{encounter_type equal F}
+    N14{self_rated_health in ['good', 'excellent']}
+    N15["CFS 3: Managing Well"]
+    N14 -- Yes --> N15
+    N16["CFS 4: Living with Very Mild Frailty"]
+    N14 -- No --> N16
+    N13 -- Yes --> N14
+    N17["CFS 4: Living with Very Mild Frailty"]
+    N13 -- No --> N17
+    N12 -- Yes --> N13
+    N18{self_rated_health in ['Fair', 'Poor']}
+    N19{encounter_type equal F}
+    N20{self_rated_health in ['good', 'excellent']}
+    N21["CFS 3: Managing Well"]
+    N20 -- Yes --> N21
+    N22["CFS 4: Living with Very Mild Frailty"]
+    N20 -- No --> N22
+    N19 -- Yes --> N20
+    N23["CFS 4: Living with Very Mild Frailty"]
+    N19 -- No --> N23
+    N18 -- Yes --> N19
+    N24{effort_to_perform_tasks equal sometimes_occasionally}
+    N25{engages_in_strenuous_activity equal False}
+    N26["CFS 3: Managing Well"]
+    N25 -- Yes --> N26
+    N27["CFS 2: Fit"]
+    N25 -- No --> N27
+    N24 -- Yes --> N25
+    N28{effort_to_perform_tasks equal rarely_never}
+    N29{engages_in_strenuous_activity equal False}
+    N30["CFS 2: Fit"]
+    N29 -- Yes --> N30
+    N31["CFS 1: Very Fit"]
+    N29 -- No --> N31
+    N28 -- Yes --> N29
+    N32{encounter_type equal F}
+    N33{self_rated_health in ['good', 'excellent']}
+    N34["CFS 3: Managing Well"]
+    N33 -- Yes --> N34
+    N35["CFS 4: Living with Very Mild Frailty"]
+    N33 -- No --> N35
+    N32 -- Yes --> N33
+    N36["CFS 4: Living with Very Mild Frailty"]
+    N32 -- No --> N36
+    N28 -- No --> N32
+    N24 -- No --> N28
+    N18 -- No --> N24
+    N12 -- No --> N18
+    N8 -- No --> N12
+    N6 -- No --> N8
+    N2 -- No --> N6
+    N0 -- No --> N2
 ```
 
 </details>
