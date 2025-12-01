@@ -302,6 +302,10 @@ class CFSCalculator:
             facts['is_terminally_ill'] = False
             return
             
+        # Get encounter type (Admission 'A' or Follow-up 'F')
+        if 'fFolder' in patient_diagnoses.columns and not patient_diagnoses['fFolder'].empty:
+            facts['encounter_type'] = patient_diagnoses['fFolder'].iloc[0]
+
         diagnoses_list = patient_diagnoses['Name'].str.upper().tolist()
         
         # Check for terminal illness
@@ -328,10 +332,9 @@ class CFSCalculator:
         facts['iadl_count'] = sum(1 for dep in iadl_dependencies if dep in functional_status)
         
         # Set defaults if not present
-        if 'engages_in_strenuous_activity' not in facts:
-            facts['engages_in_strenuous_activity'] = False # Default to 'No'
-        if 'effort_to_perform_tasks' not in facts:
-            facts['effort_to_perform_tasks'] = "not_specified"
+        facts.setdefault('engages_in_strenuous_activity', False) # Default to 'No'
+        facts.setdefault('effort_to_perform_tasks', "not_specified")
+        facts.setdefault('encounter_type', 'A') # Default to Admission
 
 
     def calculate(self, patient_data: pd.Series, diagnosis_data: pd.DataFrame) -> Dict[str, Any]:
