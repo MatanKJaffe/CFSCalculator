@@ -233,17 +233,25 @@ class CFSCalculator:
         cfs_8 = ResultNode(8, "Living with Very Severe Frailty, Totally Dependent")
         cfs_9 = ResultNode(9, "Terminally Ill")
 
+        # --- New Logic Gate for fFolder (Encounter Type) ---
+        # If a patient would normally be CFS 4, check if it's a Follow-up visit.
+        # If it is a Follow-up AND their health is Good/Excellent, upgrade them to CFS 3.
+        # Otherwise, they remain CFS 4.
+        follow_up_cfs_4_check = DecisionNode("self_rated_health", "in", ["good", "excellent"], cfs_3, cfs_4)
+        cfs_4_gate = DecisionNode("encounter_type", "equal", 'F', follow_up_cfs_4_check, cfs_4)
+        # --- End of New Logic Gate ---
+
         # Decision branches, built from the bottom up for clarity
         
         engages_activity_no_for_fit = DecisionNode("engages_in_strenuous_activity", "equal", False, cfs_2, cfs_1)
-        fit_or_very_fit_branch = DecisionNode("effort_to_perform_tasks", "equal", "rarely_never", engages_activity_no_for_fit, cfs_4) # Simplified this branch
+        fit_or_very_fit_branch = DecisionNode("effort_to_perform_tasks", "equal", "rarely_never", engages_activity_no_for_fit, cfs_4_gate)
 
         engages_activity_no_for_managing = DecisionNode("engages_in_strenuous_activity", "equal", False, cfs_3, cfs_2)
         managing_well_branch = DecisionNode("effort_to_perform_tasks", "equal", "sometimes_occasionally", engages_activity_no_for_managing, fit_or_very_fit_branch)
         
-        health_branch = DecisionNode("self_rated_health", "in", ["Fair", "Poor"], cfs_4, managing_well_branch)
+        health_branch = DecisionNode("self_rated_health", "in", ["Fair", "Poor"], cfs_4_gate, managing_well_branch)
         
-        chronic_condition_branch = DecisionNode("chronic_condition_count", "greater_than_or_equal", 10, cfs_4, health_branch)
+        chronic_condition_branch = DecisionNode("chronic_condition_count", "greater_than_or_equal", 10, cfs_4_gate, health_branch)
         
         iadl_range_branch = DecisionNode("iadl_count", "in_range", [1, 4], cfs_5, cfs_6)
         iadl_branch = DecisionNode("iadl_count", "greater_than_or_equal", 1, iadl_range_branch, chronic_condition_branch)
